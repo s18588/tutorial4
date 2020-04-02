@@ -1,2 +1,5 @@
 # Default ignored files
 /.idea.Tutorial_4/.idea/workspace.xml
+# Datasource local storage ignored files
+/.idea.Tutorial_4/.idea/dataSources/
+/.idea.Tutorial_4/.idea/dataSources.local.xml

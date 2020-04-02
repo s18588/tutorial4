@@ -5,40 +5,41 @@ using Tutorial4.Models;
 using System.Data.SqlClient;
 using System.Globalization;
 using com.sun.org.apache.bcel.@internal.generic;
+using java.awt.print;
 using java.lang;
 using java.sql;
 using Microsoft.AspNetCore.Identity;
 using String = System.String;
 
 
-[ApiController]
+    [ApiController]
     [Route("api/students")]
     
     public class StudentsController : ControllerBase
     {
-
-        [HttpGet]
-        public IActionResult getStudent()
+        private string connstring =
+            "Data Source=10.1.1.36,1433;Initial Catalog=s18588;User ID=apbds18588;Password=admin";
+        
+        [HttpGet("{id}")]
+        public IActionResult getStudent(string id)
         {
-            using (var client =
-                new SqlConnection("Data Source=db-mssql;Initial Catalog=s18588;Integrated Security=True"))
+            SqlConnection c = new SqlConnection();
+            using (var client = new SqlConnection(connstring))
             using (var com = new SqlCommand())
             {
                 com.Connection = client;
-                com.CommandText = "select * from student,Enrollment,studies join Enrollment E on Studies.IdStudy = E.IdStudy join Studies S on E.IdStudy = S.IdStudy;";
+                com.CommandText = "select semester from Student left join Enrollment E on Student.IdEnrollment = E.IdEnrollment left join Studies S on E.IdStudy = S.IdStudy where Student.IndexNumber=@id;";
+                com.Parameters.AddWithValue("id", id);
                 client.Open();
                 var dr = com.ExecuteReader();
                 while (dr.Read())
                 {
                     var st = new Student();
-                    st.FirstName = dr["FirstName"].ToString();
-                    st.LastName = dr["LastName"].ToString();
-                    st.BirthDate = DateTime.ParseExact(dr["BirthDate"].ToString(),"yyyy-MM-dd HH:mm",CultureInfo.InvariantCulture);
-                    st.Studies = dr["Studies.Name"].ToString();
-                    st.Semester = Integer.parseInt(dr["Enrollment.Semester"].ToString());
-                    return Ok(st);
+                    st.Semester = Integer.parseInt(dr["Semester"].ToString());
+                    return Ok(st.Semester);
                 }
-                return null;
+
+                return NotFound("Not found");
 
             }
 
